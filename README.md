@@ -1,6 +1,8 @@
 # This tool is developed by Apurva Anand.
 ## Raise an issue for any kind of help and star this repository so you don't forget the solution! 😉
 
+## Refer to this link - https://skip-course.netlify.app/
+
 # Manual
 
 - Requirements - 
