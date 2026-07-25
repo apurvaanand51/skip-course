@@ -16,13 +16,14 @@
     ## manual cookie setup - 
     - go to C drive then Users then select your username there you will see a folder name ".skip-course" in that folder you will see config.json file in that file copy the following content - 
     
-    {
+    ```{
         "cookies": {
             "CAUTH": "...",
             "CSRF3-Token": "...",
             "__204u": "..."
         }
     }
+    ```
 
     then go to browser open coursera open console (ctrl + shift + i) go to application on left side find cookies. there you will find you cookies copy and paste csrf toker, __204u and CAUTH one by one, save and exit the file.
 
