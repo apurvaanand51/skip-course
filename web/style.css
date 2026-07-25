@@ -1,0 +1,169 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #ffffff;
+    color: #222;
+    line-height: 1.7;
+}
+
+.container {
+    max-width: 760px;
+    margin: 50px auto;
+    padding: 0 20px 60px;
+}
+
+header {
+    margin-bottom: 50px;
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #555;
+}
+
+.card {
+    margin-bottom: 45px;
+    padding-bottom: 35px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.card:last-of-type {
+    border-bottom: none;
+}
+
+.card h2 {
+    font-size: 1.35rem;
+    margin-bottom: 15px;
+}
+
+.card p {
+    margin-bottom: 14px;
+    color: #444;
+}
+
+.card ol {
+    padding-left: 22px;
+    margin-bottom: 18px;
+}
+
+.card ul {
+    margin-top: 8px;
+    padding-left: 20px;
+}
+
+label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s;
+}
+
+input:focus {
+    border-color: #555;
+}
+
+.button-group {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 10px 18px;
+    border: 1px solid #bbb;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: .2s;
+}
+
+button:hover {
+    background: #f5f5f5;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.output,
+.path {
+    margin-top: 18px;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+    font-family: Consolas, monospace;
+    min-height: 60px;
+}
+
+.path {
+    min-height: auto;
+}
+
+footer {
+    margin-top: 60px;
+    text-align: center;
+}
+
+footer h2 {
+    margin-bottom: 15px;
+}
+
+footer p {
+    color: #555;
+    margin-top: 8px;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+
+    .container {
+        margin: 30px auto;
+        padding: 0 16px 40px;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+
+}
