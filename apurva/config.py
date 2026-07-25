@@ -8,7 +8,11 @@ CONFIG_DIR = Path.home() / ".skip-course"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 
 DEFAULT_CONFIG = {
-    "cookies": {},
+    "cookies": {
+        "CAUTH": "...",
+        "CSRF3-Token": "...",
+        "__204u": "..."
+    }
 }
 
 

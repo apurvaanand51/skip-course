@@ -13,7 +13,7 @@
 ## step 4 - python -m apurva.main (name of course extracted from link)
  - it will then try to fetch the cookies from you browser if it is unable to do so it will throw an error
 
- ## manual cookie setup - 
+    ## manual cookie setup - 
     - go to C drive then Users then select your username there you will see a folder name ".skip-course" in that folder you will see config.json file in that file copy the following content - 
     
     {
