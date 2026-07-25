@@ -16,7 +16,8 @@
     ## manual cookie setup - 
     - go to C drive then Users then select your username there you will see a folder name ".skip-course" in that folder you will see config.json file in that file copy the following content - 
     
-    ```{
+    ```
+    {
         "cookies": {
             "CAUTH": "...",
             "CSRF3-Token": "...",
