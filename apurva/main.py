@@ -1,32 +1,31 @@
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 import click
 import httpx
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from .config import fetch_browser_cookies, CONFIG_FILE, DEFAULT_CONFIG, BASE_URL, HEADERS, COOKIES
-import json
 from loguru import logger
-from .assessment.solver import GradedSolver
-from .discussion.solver import DiscussionPromptSolver
+
 from .coach.solver import CoachSolver
+from .config import BASE_URL, CONFIG_FILE, DEFAULT_CONFIG, HEADERS, ensure_cookies, fetch_browser_cookies
+from .session_utils import get_csrf_headers
 from .watcher.watch import Watcher
-from .session_utils import get_csrf_headers, random_delay
 
 
-class Skipera(object):
-    def __init__(self, course: str, llm: bool):
+class SkipCourse(object):
+    def __init__(self, course: str):
         self.user_id = None
         self.course_id = None
         self.base_url = BASE_URL
         self.session = httpx.Client(timeout=60.0, follow_redirects=True)
         self.session.headers.update(HEADERS)
-        self.session.cookies.update(COOKIES)
+        self.session.cookies.update(ensure_cookies())
         self.course = course
-        self.llm = llm
         self.failed_items = set()
+
         if not self.get_userid():
             self.refresh_cookies()
             if not self.get_userid():
-                logger.error(
-                    "Cookies are invalid. Log into Coursera in your browser, close it, and retry.")
+                logger.error("Cookies are invalid. Log into Coursera in your browser, close it, and retry.")
                 raise SystemExit
 
     def refresh_cookies(self):
@@ -34,16 +33,15 @@ class Skipera(object):
         cookies = fetch_browser_cookies()
         if not cookies:
             return
+
         self.session.cookies.clear()
         self.session.cookies.update(cookies)
-        cfg = json.loads(CONFIG_FILE.read_text()
-                         ) if CONFIG_FILE.exists() else DEFAULT_CONFIG.copy()
+        cfg = json.loads(CONFIG_FILE.read_text()) if CONFIG_FILE.exists() else DEFAULT_CONFIG.copy()
         cfg["cookies"] = cookies
         CONFIG_FILE.write_text(json.dumps(cfg, indent=2))
 
     def get_userid(self) -> bool:
-        r = self.session.get(
-            self.base_url + "adminUserPermissions.v1?q=my").json()
+        r = self.session.get(self.base_url + "adminUserPermissions.v1?q=my").json()
         try:
             self.user_id = r["elements"][0]["id"]
             logger.info("User ID: " + self.user_id)
@@ -59,14 +57,13 @@ class Skipera(object):
         all_items = r["linked"]["onDemandCourseMaterialItems.v2"]
 
         logger.info("Course ID: " + self.course_id)
-        logger.info("Number of Modules: " +
-                    str(len(r["linked"]["onDemandCourseMaterialModules.v1"])))
+        logger.info("Number of Modules: " + str(len(r["linked"]["onDemandCourseMaterialModules.v1"])))
         logger.info("Total items: " + str(len(all_items)))
 
         self.process_items(all_items)
 
     def get_course_materials(self) -> dict:
-        r = self.session.get(self.base_url + f"onDemandCourseMaterials.v2/", params={
+        r = self.session.get(self.base_url + "onDemandCourseMaterials.v2/", params={
             "q": "slug",
             "slug": self.course,
             "includes": "modules,lessons,passableItemGroups,passableItemGroupChoices,passableLessonElements,items,"
@@ -81,7 +78,7 @@ class Skipera(object):
                       "customDisplayTypenameOverride),onDemandCourseMaterialTracks.v1(passablesCount),"
                       "onDemandGradingParameters.v1(gradedAssignmentGroups),"
                       "contentAtomRelations.v1(embeddedContentSourceCourseId,subContainerId)",
-            "showLockedItems": True
+            "showLockedItems": True,
         })
 
         if r.status_code != 200:
@@ -108,37 +105,32 @@ class Skipera(object):
                 break
 
             unlocked_items = [
-                item for item in pending_items 
+                item for item in pending_items
                 if not item.get("isLocked", False) and item["id"] not in self.failed_items
             ]
             if not unlocked_items:
-                logger.info(
-                    f"Finished: {total - len(pending_items)}/{total} completed, {len(pending_items)} still locked/pending."
-                )
+                logger.info(f"Finished: {total - len(pending_items)}/{total} completed, {len(pending_items)} still locked/pending.")
                 break
 
             concurrent_items = []
             sequential_items = []
             for item in unlocked_items:
-                if item["contentSummary"]["typeName"] not in {"discussionPrompt", "ungradedAssignment", "staffGraded", "phasedPeer"}:
-                    concurrent_items.append(item)
-                else:
+                if item["contentSummary"]["typeName"] in {"discussionPrompt", "ungradedAssignment", "staffGraded", "phasedPeer"}:
                     sequential_items.append(item)
+                else:
+                    concurrent_items.append(item)
 
             if concurrent_items:
                 with ThreadPoolExecutor(max_workers=min(6, len(concurrent_items))) as executor:
-                    futures = {
-                        executor.submit(self.process_item, item): item 
-                        for item in concurrent_items
-                    }
+                    futures = {executor.submit(self.process_item, item): item for item in concurrent_items}
                     for future in as_completed(futures):
                         item = futures[future]
                         try:
                             success = future.result()
                             if not success:
                                 self.failed_items.add(item["id"])
-                        except Exception as e:
-                            logger.exception(f"Error in processing item: {e}")
+                        except Exception as exc:
+                            logger.exception(f"Error in processing item: {exc}")
                             self.failed_items.add(item["id"])
                 continue
 
@@ -148,47 +140,39 @@ class Skipera(object):
                     success = self.process_item(item)
                     if not success:
                         self.failed_items.add(item["id"])
-                except Exception as e:
-                    logger.exception(f"Error in processing item: {e}")
+                except Exception as exc:
+                    logger.exception(f"Error in processing item: {exc}")
                     self.failed_items.add(item["id"])
                 continue
 
     def process_item(self, item: dict) -> bool:
         item_type = item["contentSummary"]["typeName"]
-        module_id = item.get('moduleId', 'unknown')
-        item_id = item['id']
-        logger.info(
-            f"[module:{module_id}] [item:{item_id}] Processing {item['name']}")
+        module_id = item.get("moduleId", "unknown")
+        item_id = item["id"]
+        logger.info(f"[module:{module_id}] [item:{item_id}] Processing {item['name']}")
 
-        success = False
         if item_type == "lecture":
-            success = self.watch_item(item, self.get_video_metadata(item_id))
-        elif item_type == "supplement":
-            success = self.read_item(item_id)
-        elif item_type in {"ungradedAssignment", "staffGraded"} and self.llm:
-            success = GradedSolver(
-                self.session, self.course_id, item_id).solve()
-        elif item_type == "discussionPrompt" and self.llm:
-            success = DiscussionPromptSolver(
-                self.session, self.user_id, self.course_id, item_id).solve()
-        elif item_type == "coach":
-            success = CoachSolver(
-                self.session, self.user_id, self.course_id, item_id).solve()
-        elif item_type == "ungradedWidget":
-            success = self.ungraded_widget_item(item_id)
-        elif item_type == "ungradedLti":
-            success = self.ungraded_lti_item(item_id)
-        else:
-            logger.warning(
-                f"[module:{module_id}] [item:{item_id}] Unknown/skipped item type: {item_type} - skipping.")
+            return self.watch_item(item, self.get_video_metadata(item_id))
+        if item_type == "supplement":
+            return self.read_item(item_id)
+        if item_type == "coach":
+            return CoachSolver(self.session, self.user_id, self.course_id, item_id).solve()
+        if item_type == "ungradedWidget":
+            return self.ungraded_widget_item(item_id)
+        if item_type == "ungradedLti":
+            return self.ungraded_lti_item(item_id)
 
-        return success
+        if item_type in {"ungradedAssignment", "staffGraded", "discussionPrompt"}:
+            logger.info(f"[module:{module_id}] [item:{item_id}] Skipping {item_type} without extra automation.")
+            return True
+
+        logger.warning(f"[module:{module_id}] [item:{item_id}] Unknown/skipped item type: {item_type} - skipping.")
+        return True
 
     def get_completed_items(self) -> set[str]:
         r = self.session.get(
-            self.base_url +
-            f"onDemandCoursesProgress.v1/{self.user_id}~{self.course_id}",
-            params={"fields": "gradedAssignmentGroupProgress"}
+            self.base_url + f"onDemandCoursesProgress.v1/{self.user_id}~{self.course_id}",
+            params={"fields": "gradedAssignmentGroupProgress"},
         )
 
         if r.status_code != 200:
@@ -210,33 +194,36 @@ class Skipera(object):
         }
 
     def get_video_metadata(self, item_id: str) -> dict:
-        r = self.session.get(self.base_url + f"onDemandLectureVideos.v1/{self.course_id}~{item_id}", params={
-            "includes": "video",
-            "fields": "disableSkippingForward,startMs,endMs"
-        }).json()
+        r = self.session.get(
+            self.base_url + f"onDemandLectureVideos.v1/{self.course_id}~{item_id}",
+            params={"includes": "video", "fields": "disableSkippingForward,startMs,endMs"},
+        ).json()
 
-        return {"can_skip": not r["elements"][0]["disableSkippingForward"],
-                "tracking_id": r["linked"]["onDemandVideos.v1"][0]["id"]}
+        return {
+            "can_skip": not r["elements"][0]["disableSkippingForward"],
+            "tracking_id": r["linked"]["onDemandVideos.v1"][0]["id"],
+        }
 
     def watch_item(self, item: dict, metadata: dict) -> bool:
-        watcher = Watcher(self.session, item, metadata,
-                          self.user_id, self.course, self.course_id)
+        watcher = Watcher(self.session, item, metadata, self.user_id, self.course, self.course_id)
         return watcher.watch_item()
 
     def read_item(self, item_id) -> bool:
-        r = self.session.post(self.base_url + "onDemandSupplementCompletions.v1",
-                              headers=get_csrf_headers(self.session),
-                              json={
-                                  "courseId": self.course_id,
-                                  "itemId": item_id,
-                                  "userId": int(self.user_id)
-                              })
+        r = self.session.post(
+            self.base_url + "onDemandSupplementCompletions.v1",
+            headers=get_csrf_headers(self.session),
+            json={
+                "courseId": self.course_id,
+                "itemId": item_id,
+                "userId": int(self.user_id),
+            },
+        )
         return "Completed" in r.text
 
     def ungraded_widget_item(self, item_id) -> bool:
         r = self.session.get(
             self.base_url + f"onDemandWidgetSessions.v1/{self.user_id}~{self.course_id}~{item_id}",
-            params={"fields": "session,sessionId"}
+            params={"fields": "session,sessionId"},
         )
         if r.status_code != 200:
             logger.error(f"Failed to get session for widget {item_id}: {r.status_code}")
@@ -251,10 +238,7 @@ class Skipera(object):
         res = self.session.put(
             self.base_url + f"onDemandWidgetProgress.v1/{self.user_id}~{self.course_id}~{item_id}",
             headers=get_csrf_headers(self.session),
-            json={
-                "sessionId": session_id,
-                "progressState": "Completed"
-            }
+            json={"sessionId": session_id, "progressState": "Completed"},
         )
         return 200 <= res.status_code < 300
 
@@ -266,19 +250,19 @@ class Skipera(object):
                 "courseId": self.course_id,
                 "itemId": item_id,
                 "learnerId": int(self.user_id),
-                "markItemCompleted": True
-            }
+                "markItemCompleted": True,
+            },
         )
         return 200 <= r.status_code < 300
 
 
 @logger.catch
 @click.command()
-@click.argument('slug')
-@click.option('--llm', is_flag=True, help="Whether to use an LLM to solve graded assignments.")
-def main(slug: str, llm: bool) -> None:
-    skipera = Skipera(slug, llm)
-    skipera.get_course()
+@click.argument("slug")
+def main(slug: str) -> None:
+    skip_course = SkipCourse(slug)
+    skip_course.get_course()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
