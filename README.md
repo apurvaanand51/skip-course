@@ -3,6 +3,8 @@
 
 ## Refer to this link - https://skip-course.netlify.app/
 
+![Screenshot](./img.png)
+
 # Manual
 
 - Requirements - 
