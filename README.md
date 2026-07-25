@@ -1,5 +1,5 @@
 # This tool is developed by Apurva Anand.
-## Raise an issue for any kind of help and star this repository so you don't forget the solution! 😉
+## Raise an issue for any kind of help and star this repository so you don't forget the solution! 😉 <br> If you are doing it again after few days, make sure to go through entire process again since tokens often get changed.
 
 ## Refer to this link - https://skip-course.netlify.app/
 
