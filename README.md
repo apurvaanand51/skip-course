@@ -6,7 +6,7 @@
 - Requirements - 
     - Python (install python if it's not installed on your pc)
 
-## step 1 - git clone https://github.com/apurvaanand51/skip-course 
+## step 1 - git clone https://github.com/apurvaanand51/skip-course.git 
 (if you do not have git installed on you pc you can download zip file by clicking on the code button and then unzip it)
 ## step 2 - right click on folder and open in terminal
 ## step 3 - pip install -r requirements.txt
