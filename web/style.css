@@ -12,13 +12,13 @@ body {
 }
 
 .container {
-    max-width: 760px;
+    max-width: 900px;
     margin: 50px auto;
     padding: 0 20px 60px;
 }
 
 header {
-    margin-bottom: 50px;
+    margin-bottom: 40px;
 }
 
 header h1 {
@@ -28,7 +28,32 @@ header h1 {
 
 header p {
     color: #555;
+    margin-bottom: 6px;
 }
+
+/* ---------- Images ---------- */
+
+.hero-image,
+.guide-image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 25px auto;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.hero-image {
+    margin-bottom: 40px;
+}
+
+.guide-image {
+    margin-top: 20px;
+    margin-bottom: 25px;
+}
+
+/* ----------------------------- */
 
 .card {
     margin-bottom: 45px;
@@ -147,15 +172,22 @@ a:hover {
     text-decoration: underline;
 }
 
-@media (max-width: 600px) {
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
 
     .container {
-        margin: 30px auto;
-        padding: 0 16px 40px;
+        max-width: 100%;
+        padding: 20px;
+        margin: 20px auto;
     }
 
     header h1 {
         font-size: 1.8rem;
+    }
+
+    .card h2 {
+        font-size: 1.2rem;
     }
 
     .button-group {
@@ -164,6 +196,28 @@ a:hover {
 
     button {
         width: 100%;
+    }
+
+    .hero-image,
+    .guide-image {
+        width: 100%;
+        margin: 20px auto;
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    body {
+        font-size: 15px;
+    }
+
+    header h1 {
+        font-size: 1.6rem;
+    }
+
+    .card h2 {
+        font-size: 1.1rem;
     }
 
 }
