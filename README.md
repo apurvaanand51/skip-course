@@ -1,6 +1,6 @@
 # Skip Course
 
-> Skip completed Coursera course videos in minutes.
+> Skip Coursera course videos in minutes.
 
 <p align="center">
   <img src="./web/img.png" width="900">
