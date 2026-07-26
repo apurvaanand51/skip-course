@@ -10,12 +10,15 @@ const jsonOutput = document.getElementById("json-output");
 
 const generateBtn = document.getElementById("generate");
 const copyBtn = document.getElementById("copy");
+const saveBtn = document.getElementById("save");
 
 const urlInput = document.getElementById("course-url");
 const slugOutput = document.getElementById("slug-output");
 
 const extractBtn = document.getElementById("extract");
 const copySlugBtn = document.getElementById("copy-slug");
+
+
 
 // --------------------
 // Helper
@@ -187,5 +190,43 @@ slugOutput.addEventListener("click", () => {
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
+
+});
+
+saveBtn.addEventListener("click", () => {
+
+    const csrf = csrfInput.value.trim();
+    const uu = uuInput.value.trim();
+    const cauth = cauthInput.value.trim();
+
+    if (!csrf || !uu || !cauth) {
+        alert("Please fill in all three cookie values.");
+        return;
+    }
+
+    const config = {
+        cookies: {
+            CAUTH: cauth,
+            "CSRF3-Token": csrf,
+            "__204u": uu
+        }
+    };
+
+    const blob = new Blob(
+        [JSON.stringify(config, null, 4)],
+        { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "config.json";
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
 
 });
