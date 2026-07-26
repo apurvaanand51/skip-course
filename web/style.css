@@ -9,6 +9,7 @@ body {
     background: #ffffff;
     color: #222;
     line-height: 1.7;
+    transition: background .3s, color .3s;
 }
 
 .container {
@@ -220,4 +221,63 @@ a:hover {
         font-size: 1.1rem;
     }
 
+}
+
+#theme-toggle{
+    margin-top:20px;
+}
+
+/* =========================
+   Dark Mode
+========================= */
+
+body.dark{
+    background:#121212;
+    color:#f1f1f1;
+}
+
+body.dark header p,
+body.dark .card p,
+body.dark footer p{
+    color:#cfcfcf;
+}
+
+body.dark .card{
+    border-bottom:1px solid #333;
+}
+
+body.dark input{
+    background:#1e1e1e;
+    color:white;
+    border:1px solid #555;
+}
+
+body.dark input::placeholder{
+    color:#999;
+}
+
+body.dark button{
+    background:#202020;
+    color:white;
+    border:1px solid #555;
+}
+
+body.dark button:hover{
+    background:#303030;
+}
+
+body.dark .output,
+body.dark .path{
+    background:#1e1e1e;
+    color:#f1f1f1;
+    border-color:#444;
+}
+
+body.dark a{
+    color:#6aa8ff;
+}
+
+body.dark .hero-image,
+body.dark .guide-image{
+    border-color:#444;
 }
