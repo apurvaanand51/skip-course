@@ -1,37 +1,384 @@
-# This tool is developed by Apurva Anand.
-## Raise an issue for any kind of help and star this repository so you don't forget the solution! 😉 <br> If you are doing it again after few days, make sure to go through entire process again since tokens often get changed.
+# Skip Course
 
-## Refer to this link - https://skip-course.netlify.app/
+> Skip completed Coursera course videos in minutes.
 
-![Screenshot](./img.png)
+<p align="center">
+  <img src="./web/img.png" width="900">
+</p>
 
-# Manual
+---
 
-- Requirements - 
-    - Python (install python if it's not installed on your pc)
+## 👨‍💻 Developer
 
-## step 1 - git clone https://github.com/apurvaanand51/skip-course.git 
-(if you do not have git installed on you pc you can download zip file by clicking on the code button and then unzip it)
-## step 2 - right click on folder and open in terminal
-## step 3 - pip install -r requirements.txt
-## step 4 - python -m apurva.main (name of course extracted from link)
- - it will then try to fetch the cookies from you browser if it is unable to do so it will throw an error
+### **Apurva Anand**
 
-    ## manual cookie setup - 
-    - go to C drive then Users then select your username there you will see a folder name ".skip-course" in that folder you will see config.json file in that file copy the following content - 
-    
-    ```
-    {
-        "cookies": {
-            "CAUTH": "...",
-            "CSRF3-Token": "...",
-            "__204u": "..."
-        }
-    }
-    ```
+Full Stack Developer • Python • Machine Learning • Open Source Enthusiast
 
-    then go to browser open coursera open console (ctrl + shift + i) go to application on left side find cookies. there you will find you cookies copy and paste csrf toker, __204u and CAUTH one by one, save and exit the file.
+- GitHub: https://github.com/apurvaanand51
+- Project: Skip Course
+- Language: Python
 
-    run this command again and all your lecture will be completed in minutes.
+---
 
-## python -m apurva.main (name of course extraxted from link)
+## 📖 About
+
+Skip Course is a lightweight Python automation tool that automatically marks Coursera course videos as completed.
+
+Instead of manually opening every lecture and waiting for progress to update, this tool communicates with Coursera using your authenticated session and completes the process within a few minutes.
+
+The project also includes a simple web utility that helps users generate the required configuration file and extract course slugs without editing JSON manually.
+
+---
+
+# ✨ Features
+
+- Generate `config.json` automatically
+- Extract Course Slug from any Coursera URL
+- Lightweight Python CLI
+- Simple HTML helper website
+- No browser automation required
+- Works using your Coursera session cookies
+- Setup takes less than 5 minutes
+
+---
+
+# 📂 Project Structure
+
+```
+skip-course
+│
+├── apurva/
+│   ├── main.py
+│   ├── ...
+│
+├── web/
+│   ├── index.html
+│   ├── style.css
+│   ├── main.js
+│   ├── img.png
+│   └── cookie.jpg
+│
+├── requirements.txt
+└── README.md
+```
+
+---
+
+# 🖥️ Website Utility
+
+The repository contains a simple helper website.
+
+It allows users to
+
+- Generate config.json
+- Copy JSON
+- Download config.json
+- Extract Course Slug
+- Copy Course Slug
+- Toggle Dark Mode
+
+Website Preview
+
+<p align="center">
+<img src="./web/img.png">
+</p>
+
+---
+
+# ⚙️ Local Setup
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/apurvaanand51/skip-course.git
+
+cd skip-course
+```
+
+---
+
+## 2. Install Python
+
+Python is required.
+
+Download it from
+
+https://www.python.org/downloads/
+
+or watch
+
+https://www.youtube.com/watch?v=ddGTXBhaGWA
+
+Verify installation
+
+```bash
+python --version
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+If the terminal appears stuck on
+
+```
+pyproject.toml
+```
+
+simply press
+
+```
+Ctrl + C
+```
+
+This is completely normal.
+
+---
+
+# 🌐 Using the Website
+
+Open
+
+[https://skip-course.netlify.app](https://skip-course.netlify.app)
+
+
+in your browser.
+
+The page guides you through the entire setup process.
+
+---
+
+# 🔐 Step 1 — Obtain Coursera Cookies
+
+Login to your Coursera account.
+
+Open Developer Tools
+
+```
+Right Click
+↓
+
+Inspect
+↓
+
+Application
+
+↓
+
+Cookies
+
+↓
+
+coursera.org
+```
+
+Copy
+
+- CAUTH
+- CSRF3-Token
+- __204u
+
+Example
+
+<p align="center">
+<img src="./web/cookie.jpg">
+</p>
+
+---
+
+# 📝 Step 2 — Generate config.json
+
+Paste
+
+- CAUTH
+- CSRF3-Token
+- __204u
+
+into the website.
+
+Click
+
+```
+Generate JSON
+```
+
+You may
+
+- Copy JSON
+- Download config.json
+
+---
+
+# 📁 Step 3 — Create Configuration Folder
+
+Create
+
+```
+C:\Users\<YOUR_USERNAME>\.skip-course
+```
+
+Place
+
+```
+config.json
+```
+
+inside that folder.
+
+The structure should become
+
+```
+C:\Users\<USERNAME>
+
+└── .skip-course
+    └── config.json
+```
+
+---
+
+# 🔗 Step 4 — Extract Course Slug
+
+Paste any Coursera course URL.
+
+Example
+
+```
+https://www.coursera.org/learn/machine-learning/home
+```
+
+Output
+
+```
+machine-learning
+```
+
+Copy the generated slug.
+
+---
+
+# ▶ Step 5 — Run the Tool
+
+Inside the project directory
+
+```bash
+python -m apurva.main machine-learning
+```
+
+Replace
+
+```
+machine-learning
+```
+
+with your own course slug.
+
+---
+
+# ❗ Common Errors
+
+## Module Not Found
+
+Install the missing package
+
+```bash
+pip install package-name
+```
+
+Example
+
+```bash
+pip install click
+```
+
+---
+
+## Invalid Cookies
+
+Ensure you copied
+
+- CAUTH
+- CSRF3-Token
+- __204u
+
+from the same logged-in browser session.
+
+---
+
+## Invalid Course Slug
+
+Only use the slug.
+
+Correct
+
+```
+machine-learning
+```
+
+Incorrect
+
+```
+https://www.coursera.org/learn/machine-learning/home
+```
+
+---
+
+# 💡 Example
+
+```bash
+python -m apurva.main python-data-analysis
+```
+
+---
+
+# 🛠 Technologies Used
+
+- Python
+- Requests
+- HTML
+- CSS
+- JavaScript
+
+---
+
+# 🤝 Contributing
+
+Pull Requests are welcome.
+
+Feel free to open an Issue for
+
+- Bug Reports
+- Feature Requests
+- Improvements
+
+---
+
+# ⭐ Support
+
+If this project helped you,
+
+please consider giving the repository a ⭐ on GitHub.
+
+It helps more people discover the project.
+
+---
+
+# ⚠ Disclaimer
+
+This project is intended for educational and automation purposes.
+
+Users are responsible for complying with Coursera's Terms of Service and using the software responsibly.
+
+
+<p align="center">
+
+Made with ❤️ by
+
+# Apurva Anand
+
+[LinkedIn](https://www.linkedin.com/in/apurva-anand-zeroone/)
+
+</p>
