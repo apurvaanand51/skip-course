@@ -1,6 +1,8 @@
 # Skip Course
 
 > Skip Coursera course videos in minutes.
+> This project was built purely as an educational exercise to learn about Python automation, authenticated web requests, and developer tooling. Users are responsible for complying with Coursera's Terms of Service and applicable policies.
+
 
 <p align="center">
   <img src="./web/img.png" width="900">
