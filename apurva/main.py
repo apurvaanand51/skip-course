@@ -1,10 +1,3 @@
-"""
-Refactor of the original SkipCourse tool.
-
-Same functionality and API surface as the source file — this version focuses on
-readability: type hints, a dispatch table instead of if/elif chains, dataclasses
-for structured data, and centralized constants for the item-type sets.
-"""
 
 from __future__ import annotations
 
@@ -52,12 +45,8 @@ def _print_item_status(name: str, status: str, elapsed: float) -> None:
     click.echo(f"{color}{symbol} {name:<60}{label:<10}{_fmt_seconds(elapsed)}{reset}")
 
 
-# --- Item-type classification -------------------------------------------------
-
-# Types that must be processed one-at-a-time (or are simply left for the human).
 SEQUENTIAL_TYPES = {"discussionPrompt", "ungradedAssignment", "staffGraded", "phasedPeer"}
 
-# Types explicitly left untouched — require genuine manual submission.
 MANUAL_SKIP_TYPES = {"ungradedAssignment", "staffGraded", "discussionPrompt"}
 
 MAX_WORKERS = 6
@@ -98,7 +87,7 @@ class CourseRunner:
                 logger.error("Cookies are invalid. Log into Coursera in your browser, close it, and retry.")
                 raise SystemExit
 
-    # --- Auth -------------------------------------------------------------
+    # Auth
 
     def _refresh_cookies(self) -> None:
         logger.warning("Session expired — re-fetching cookies from browser...")
@@ -124,7 +113,7 @@ class CourseRunner:
             return False
         return True
 
-    # --- Course fetching ----------------------------------------------------
+    # Course fetching
 
     def run(self) -> None:
         """Entry point: fetch course, then process items until nothing pending remains."""
@@ -181,7 +170,7 @@ class CourseRunner:
         items = elements[0].get("items", {})
         return {item_id for item_id, progress in items.items() if progress.get("progressState") == "Completed"}
 
-    # --- Scheduling loop ------------------------------------------------
+    # Scheduling loop
 
     def _process_all_items(self, all_items: list[dict]) -> None:
         total = len(all_items)
@@ -255,7 +244,7 @@ class CourseRunner:
             logger.exception(f"Error processing item {item['id']}")
             self.failed_items.add(item["id"])
 
-    # --- Item dispatch ----------------------------------------------------
+    # Item dispatch
 
     def _dispatch_item(self, item: dict) -> bool:
         item_type = item["contentSummary"]["typeName"]
